@@ -8,6 +8,7 @@ import {
   TextArea,
   TextInput,
 } from "@/components/fields";
+import { BrandingFields } from "@/components/BrandingFields";
 import { ProfileSwitcher } from "@/components/ProfileSwitcher";
 import {
   createProfile,
@@ -108,6 +109,16 @@ export default function SettingsPage() {
             placeholder="EIN 12-3456789"
           />
         </Field>
+      </SectionCard>
+
+      <SectionCard
+        title="Branding"
+        description="How this profile's documents look. Changes show in the live preview."
+      >
+        <BrandingFields
+          branding={profile.branding}
+          onChange={(branding) => set("branding", branding)}
+        />
       </SectionCard>
 
       <SectionCard title="Invoicing defaults">

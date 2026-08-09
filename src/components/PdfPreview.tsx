@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePDF } from "@react-pdf/renderer";
 import { renderDocumentPdf } from "@/components/pdf/renderDocumentPdf";
-import type { CompanyProfile, Doc } from "@/lib/types";
+import type { Doc, RenderProfile } from "@/lib/types";
 
 function useDebounced<T>(value: T, delayMs: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -24,7 +24,7 @@ function toFileName(title: string): string {
 
 interface PdfPreviewProps {
   doc: Doc;
-  profile: CompanyProfile;
+  profile: RenderProfile;
 }
 
 export default function PdfPreview({ doc, profile }: PdfPreviewProps) {

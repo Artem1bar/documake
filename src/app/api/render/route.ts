@@ -1,6 +1,6 @@
 import { renderToBuffer } from "@react-pdf/renderer";
 import { renderDocumentPdf } from "@/components/pdf/renderDocumentPdf";
-import { DEFAULT_PROFILE } from "@/lib/factories";
+import { DEFAULT_RENDER_PROFILE } from "@/lib/profile-defaults";
 import {
   describeIssues,
   isAuthorized,
@@ -39,7 +39,7 @@ export async function POST(request: Request): Promise<Response> {
     return errorResponse(400, describeIssues(parsed.error));
   }
 
-  const { profile = DEFAULT_PROFILE, filename, type } = parsed.data;
+  const { profile = DEFAULT_RENDER_PROFILE, filename, type } = parsed.data;
 
   try {
     const pdf = await renderToBuffer(renderDocumentPdf(toDoc(parsed.data), profile));

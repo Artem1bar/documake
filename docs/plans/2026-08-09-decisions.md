@@ -103,6 +103,38 @@ fence. All four are cheap to reverse; say the word and they change.
   the codec now yields a whole store. Renaming it would have churned a tested
   helper for no gain. *Reverse: free.*
 
+## T3 — PDF brand theming
+
+- **Only the accent colour and the typeface vary per profile.** Ink, muted,
+  faint, and hairline stay shared. A document where everything is branded reads
+  as noise; the accent lands on the wordmark, the table rule, and the total
+  rule, and nowhere else. *Reverse: free.*
+- **Static layout stylesheets stayed static.** Layout does not depend on
+  branding, so only colour and font are applied inline from the theme. Keeps
+  `StyleSheet.create` out of the render path. *Reverse: free.*
+- **Themes are cached by `accent|font`, capped at 32 entries.** The live
+  preview re-renders on every keystroke, and a dragged colour picker would
+  otherwise grow the map without bound. *Reverse: free.*
+- **`RenderProfile` (company fields + branding) is now the type templates take,
+  and `BrandProfile` extends it with id and label.** One type describes "enough
+  to render", which both the stored profile and an API payload satisfy — so the
+  render endpoint got branding support for free. *Reverse: free.*
+- **Fixed the INVOICE wordmark overlap** by giving `h1` an explicit
+  `lineHeight`. The page's 1.45 left a 20pt wordmark sitting on the line below
+  it. Spotted in the T5 evidence, fixed here because T3 was already in these
+  templates. *Reverse: free.*
+- **Brand token values were verified at source, not taken from the plan.**
+  `#002b72` is weblux's `--color-ink`. The plan's `#bc4b00` is not written as
+  hex anywhere in dave — it is `--accent-rgb: 188 75 0` in `ember.css`, which
+  is the same colour. Both are cited in `brand-presets.ts`. *Reverse: free.*
+- **Presets set colour and typeface only** — never company identity — so
+  applying one cannot put a name or address you did not write into a document.
+  A test asserts the preset shape stays that way. *Reverse: free.*
+- **A third "Sample — Plain" preset** was added as the way back to the neutral
+  default after trying a brand. *Reverse: free.*
+- **`render-samples.tsx` now emits one invoice per preset**, so a theming
+  change can be eyeballed in seconds. *Reverse: free.*
+
 ## T5 — render API
 
 - **Built T5 before T2/T3/T4** because it was the only remaining task with no

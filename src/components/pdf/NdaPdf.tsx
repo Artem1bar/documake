@@ -1,12 +1,12 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { formatDate } from "@/lib/format";
 import type { CompanyProfile, NdaData } from "@/lib/types";
-import { faint, pdfStyles, toLines } from "./theme";
+import type { PdfTheme } from "./theme";
+import { faint, toLines } from "./theme";
 
 const styles = StyleSheet.create({
   title: {
     fontSize: 15,
-    fontFamily: "Helvetica-Bold",
     textAlign: "center",
     letterSpacing: 1,
     marginBottom: 18,
@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
 interface NdaPdfProps {
   profile: CompanyProfile;
   data: NdaData;
+  theme: PdfTheme;
 }
 
 interface Party {
@@ -111,21 +112,22 @@ function numberWord(value: number): string {
   return NUMBER_WORDS[value] ?? String(value);
 }
 
-function SignatureBlock({ name }: { name: string }) {
+function SignatureBlock({ name, theme }: { name: string; theme: PdfTheme }) {
   return (
     <View style={styles.signatureBlock}>
-      <Text style={pdfStyles.bold}>{name || "________________________"}</Text>
+      <Text style={theme.styles.bold}>{name || "________________________"}</Text>
       <View style={styles.signatureLine} />
-      <Text style={pdfStyles.small}>Signature</Text>
+      <Text style={theme.styles.small}>Signature</Text>
       <View style={styles.signatureLine} />
-      <Text style={pdfStyles.small}>Name and title</Text>
+      <Text style={theme.styles.small}>Name and title</Text>
       <View style={styles.signatureLine} />
-      <Text style={pdfStyles.small}>Date</Text>
+      <Text style={theme.styles.small}>Date</Text>
     </View>
   );
 }
 
-export function NdaPdf({ profile, data }: NdaPdfProps) {
+export function NdaPdf({ profile, data, theme }: NdaPdfProps) {
+  const pdfStyles = theme.styles;
   const partyAName = profile.name || "[Your Company]";
   const partyBName = data.partyBName || "[Counterparty]";
   const sections = buildSections(data, partyAName, partyBName);
@@ -138,7 +140,12 @@ export function NdaPdf({ profile, data }: NdaPdfProps) {
       author={profile.name}
     >
       <Page size="A4" style={pdfStyles.page}>
-        <Text style={styles.title}>
+        <Text
+          style={[
+            styles.title,
+            { fontFamily: theme.font.bold, color: theme.accent },
+          ]}
+        >
           {data.isMutual ? "MUTUAL NON-DISCLOSURE AGREEMENT" : "NON-DISCLOSURE AGREEMENT"}
         </Text>
 
@@ -174,8 +181,8 @@ export function NdaPdf({ profile, data }: NdaPdfProps) {
         </Text>
 
         <View style={styles.signatures} wrap={false}>
-          <SignatureBlock name={partyAName} />
-          <SignatureBlock name={partyBName} />
+          <SignatureBlock name={partyAName} theme={theme} />
+          <SignatureBlock name={partyBName} theme={theme} />
         </View>
 
         <View style={pdfStyles.footer} fixed>

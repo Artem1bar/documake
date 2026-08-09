@@ -32,11 +32,16 @@ export const BrandingSchema = z.object({
 });
 export type Branding = z.infer<typeof BrandingSchema>;
 
-/** A company profile plus the identity and branding that distinguish it. */
-export const BrandProfileSchema = CompanyProfileSchema.extend({
+/** Everything a template needs to render: company details plus branding. */
+export const RenderProfileSchema = CompanyProfileSchema.extend({
+  branding: BrandingSchema.default(() => BrandingSchema.parse({})),
+});
+export type RenderProfile = z.infer<typeof RenderProfileSchema>;
+
+/** A render profile the app also stores, so it needs an identity of its own. */
+export const BrandProfileSchema = RenderProfileSchema.extend({
   id: z.string(),
   label: z.string().default("Untitled profile"),
-  branding: BrandingSchema.default(() => BrandingSchema.parse({})),
 });
 export type BrandProfile = z.infer<typeof BrandProfileSchema>;
 

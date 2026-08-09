@@ -1,6 +1,7 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import type { CompanyProfile, Question, QuestionnaireData } from "@/lib/types";
-import { faint, muted, pdfStyles } from "./theme";
+import type { PdfTheme } from "./theme";
+import { faint, muted } from "./theme";
 
 const styles = StyleSheet.create({
   company: {
@@ -12,7 +13,6 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontSize: 18,
-    fontFamily: "Helvetica-Bold",
     marginBottom: 8,
   },
   intro: {
@@ -32,7 +32,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   questionText: {
-    fontFamily: "Helvetica-Bold",
     marginBottom: 8,
   },
   answerLine: {
@@ -114,16 +113,26 @@ function AnswerArea({ question }: { question: Question }) {
 interface QuestionnairePdfProps {
   profile: CompanyProfile;
   data: QuestionnaireData;
+  theme: PdfTheme;
 }
 
-export function QuestionnairePdf({ profile, data }: QuestionnairePdfProps) {
+export function QuestionnairePdf({ profile, data, theme }: QuestionnairePdfProps) {
+  const pdfStyles = theme.styles;
+
   return (
     <Document title={data.heading || "Questionnaire"} author={profile.name}>
       <Page size="A4" style={pdfStyles.page}>
         {profile.name ? (
           <Text style={styles.company}>{profile.name}</Text>
         ) : null}
-        <Text style={styles.heading}>{data.heading || "Questionnaire"}</Text>
+        <Text
+          style={[
+            styles.heading,
+            { fontFamily: theme.font.bold, color: theme.accent },
+          ]}
+        >
+          {data.heading || "Questionnaire"}
+        </Text>
         {data.intro ? <Text style={styles.intro}>{data.intro}</Text> : null}
 
         <View style={styles.respondent}>
@@ -139,7 +148,7 @@ export function QuestionnairePdf({ profile, data }: QuestionnairePdfProps) {
 
         {data.questions.map((question, index) => (
           <View key={question.id} style={styles.question} wrap={false}>
-            <Text style={styles.questionText}>
+            <Text style={[styles.questionText, { fontFamily: theme.font.bold }]}>
               {index + 1}. {question.text || "…"}
             </Text>
             <AnswerArea question={question} />

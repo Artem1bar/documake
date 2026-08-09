@@ -2,10 +2,10 @@ import { createHash, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import type { Doc, DocType } from "./types";
 import {
-  CompanyProfileSchema,
   InvoiceDataSchema,
   NdaDataSchema,
   QuestionnaireDataSchema,
+  RenderProfileSchema,
 } from "./types";
 
 /**
@@ -21,7 +21,7 @@ const SECRET_ENV = "DOCUMAKE_RENDER_SECRET";
 const API_DOC_ID = "api-render";
 
 const renderBase = {
-  profile: CompanyProfileSchema.optional(),
+  profile: RenderProfileSchema.optional(),
   filename: z.string().regex(FILENAME_PATTERN).optional(),
 };
 

@@ -17,9 +17,14 @@ Then open the printed localhost URL. Production build: `npm run build && npm sta
 
 ## How it works
 
-- **Settings** (`/settings`) — company profile: name, address, tax ID,
-  currency, invoice numbering (auto-increments), payment terms, default tax
-  rate, default governing law.
+- **Settings** (`/settings`) — one or more brand profiles. Each keeps its own
+  company details (name, address, tax ID), invoicing defaults (currency,
+  auto-incrementing invoice numbers, payment terms, tax rate), governing law,
+  and branding. New documents use whichever profile is active.
+- **Branding** — an accent colour and a typeface per profile, applied to the
+  document heading and rules. Typefaces are the standard PDF families
+  (Helvetica, Times, Courier), so nothing is downloaded or embedded and
+  documents render identically anywhere.
 - **Dashboard** (`/`) — template cards plus your recent documents.
 - **Editor** (`/documents/[id]`) — form on the left, live PDF preview on the
   right, download button. Every change autosaves locally.
@@ -33,7 +38,8 @@ Then open the printed localhost URL. Production build: `npm run build && npm sta
 | Store | `src/lib/storage.ts` | In-memory cache with subscriptions, over an adapter |
 | React bindings | `src/lib/store-hooks.ts` | `useSyncExternalStore`-based hooks |
 | Invoice math | `src/lib/invoice-math.ts` | Integer-cents arithmetic, tested |
-| PDF templates | `src/components/pdf/` | `@react-pdf/renderer`, shared theme |
+| Profiles | `src/lib/profile-store.ts` | Pure operations over the profile list |
+| PDF templates | `src/components/pdf/` | `@react-pdf/renderer`, per-profile theme |
 | Forms | `src/components/forms/` | One per document type |
 | Render API | `src/app/api/render/route.ts` | Stateless PDF rendering for other services |
 

@@ -6,10 +6,14 @@ import { renderToFile } from "@react-pdf/renderer";
 import { InvoicePdf } from "../src/components/pdf/InvoicePdf";
 import { NdaPdf } from "../src/components/pdf/NdaPdf";
 import { QuestionnairePdf } from "../src/components/pdf/QuestionnairePdf";
+import { createPdfTheme } from "../src/components/pdf/theme";
+import { BRAND_PRESETS } from "../src/lib/brand-presets";
 import { createQuestionnaireDoc, DEFAULT_PROFILE } from "../src/lib/factories";
+import { DEFAULT_BRANDING } from "../src/lib/profile-defaults";
 import type { CompanyProfile, InvoiceData, NdaData } from "../src/lib/types";
 
 const outDir = process.argv[2] ?? ".";
+const theme = createPdfTheme(DEFAULT_BRANDING);
 
 const profile: CompanyProfile = {
   ...DEFAULT_PROFILE,
@@ -58,18 +62,37 @@ if (questionnaireDoc.type !== "questionnaire") {
   throw new Error("expected questionnaire doc");
 }
 
+function slug(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
 (async () => {
   await renderToFile(
-    <InvoicePdf profile={profile} data={invoice} />,
+    <InvoicePdf profile={profile} data={invoice} theme={theme} />,
     `${outDir}/sample-invoice.pdf`,
   );
   await renderToFile(
-    <NdaPdf profile={profile} data={nda} />,
+    <NdaPdf profile={profile} data={nda} theme={theme} />,
     `${outDir}/sample-nda.pdf`,
   );
   await renderToFile(
-    <QuestionnairePdf profile={profile} data={questionnaireDoc.data} />,
+    <QuestionnairePdf profile={profile} data={questionnaireDoc.data} theme={theme} />,
     `${outDir}/sample-questionnaire.pdf`,
   );
-  process.stdout.write(`Rendered 3 sample PDFs to ${outDir}\n`);
+
+  // One invoice per brand preset, so theming changes are easy to eyeball.
+  for (const preset of BRAND_PRESETS) {
+    await renderToFile(
+      <InvoicePdf
+        profile={profile}
+        data={invoice}
+        theme={createPdfTheme(preset.branding)}
+      />,
+      `${outDir}/brand-${slug(preset.label)}.pdf`,
+    );
+  }
+
+  process.stdout.write(
+    `Rendered ${3 + BRAND_PRESETS.length} sample PDFs to ${outDir}\n`,
+  );
 })();

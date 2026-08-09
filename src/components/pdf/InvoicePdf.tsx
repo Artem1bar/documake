@@ -2,7 +2,8 @@ import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { computeTotals, lineTotal } from "@/lib/invoice-math";
 import { formatDate, formatMoney } from "@/lib/format";
 import type { CompanyProfile, InvoiceData } from "@/lib/types";
-import { hairline, ink, muted, pdfStyles, toLines } from "./theme";
+import type { PdfTheme } from "./theme";
+import { hairline, muted, toLines } from "./theme";
 
 const styles = StyleSheet.create({
   headerRow: {
@@ -21,7 +22,6 @@ const styles = StyleSheet.create({
   tableHeader: {
     flexDirection: "row",
     borderBottomWidth: 1.5,
-    borderBottomColor: ink,
     paddingBottom: 6,
     marginTop: 18,
   },
@@ -49,7 +49,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     borderTopWidth: 1.5,
-    borderTopColor: ink,
     paddingTop: 7,
     marginTop: 3,
   },
@@ -58,9 +57,11 @@ const styles = StyleSheet.create({
 interface InvoicePdfProps {
   profile: CompanyProfile;
   data: InvoiceData;
+  theme: PdfTheme;
 }
 
-export function InvoicePdf({ profile, data }: InvoicePdfProps) {
+export function InvoicePdf({ profile, data, theme }: InvoicePdfProps) {
+  const pdfStyles = theme.styles;
   const totals = computeTotals(data.items, data.taxRate, data.discount);
   const money = (amount: number) => formatMoney(amount, data.currency);
 
@@ -69,7 +70,7 @@ export function InvoicePdf({ profile, data }: InvoicePdfProps) {
       <Page size="A4" style={pdfStyles.page}>
         <View style={styles.headerRow}>
           <View style={{ maxWidth: 250 }}>
-            <Text style={{ fontSize: 14, fontFamily: "Helvetica-Bold" }}>
+            <Text style={{ fontSize: 14, fontFamily: theme.font.bold }}>
               {profile.name || "Your Company"}
             </Text>
             {toLines(profile.address).map((line) => (
@@ -89,7 +90,7 @@ export function InvoicePdf({ profile, data }: InvoicePdfProps) {
           </View>
           <View style={styles.metaBlock}>
             <Text style={pdfStyles.h1}>INVOICE</Text>
-            <Text style={{ color: muted, marginTop: 2 }}>
+            <Text style={{ color: muted, marginTop: 4 }}>
               {data.invoiceNumber}
             </Text>
             <View style={styles.metaRow}>
@@ -116,7 +117,7 @@ export function InvoicePdf({ profile, data }: InvoicePdfProps) {
           ) : null}
         </View>
 
-        <View style={styles.tableHeader}>
+        <View style={[styles.tableHeader, { borderBottomColor: theme.accent }]}>
           <Text style={[styles.colDescription, pdfStyles.label]}>
             Description
           </Text>
@@ -152,7 +153,7 @@ export function InvoicePdf({ profile, data }: InvoicePdfProps) {
               <Text>-{money(totals.discount)}</Text>
             </View>
           ) : null}
-          <View style={styles.grandTotal}>
+          <View style={[styles.grandTotal, { borderTopColor: theme.accent }]}>
             <Text style={pdfStyles.bold}>Total due</Text>
             <Text style={[pdfStyles.bold, { fontSize: 12 }]}>
               {money(totals.total)}
