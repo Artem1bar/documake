@@ -103,6 +103,29 @@ fence. All four are cheap to reverse; say the word and they change.
   the codec now yields a whole store. Renaming it would have churned a tested
   helper for no gain. *Reverse: free.*
 
+## T6 — statement of work
+
+- **No pre-written legal text, anywhere.** Scope, out-of-scope, assumptions,
+  and change control all ship empty with placeholders that show the shape
+  without asserting the content. The fence forbids new boilerplate beyond the
+  NDA's, and an SOW's terms are the author's commitments, not this app's.
+  A test asserts these fields start empty. *Reverse: cheap, but shouldn't be.*
+- **Empty sections are omitted from the PDF entirely** rather than printed as
+  bare headings. A document with an empty "Assumptions" heading looks
+  unfinished; one without the heading just does not make that claim.
+  *Reverse: free.*
+- **A 40/40/20 milestone split ships as the default shape, with no fee.**
+  Percentages are structure, not money — the fee stays 0, so every amount
+  prints TBD until someone sets it. *Reverse: free.*
+- **The schedule warns when it does not total 100%**, in the form and on the
+  document. An SOW that bills 90% of itself is a quiet, expensive error.
+  *Reverse: free.*
+- **Milestone amounts derive from the fee and the percentage** rather than
+  being entered separately, so the schedule cannot silently disagree with the
+  total. Integer-cent maths, matching invoice and quote. *Reverse: moderate.*
+- **The NDA's not-legal-advice banner is reused verbatim**, per the fence.
+  *Reverse: n/a.*
+
 ## T4 — quote/proposal template
 
 - **An unpriced line prints "TBD", not "$0.00".** A quote is written before the

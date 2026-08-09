@@ -1,8 +1,9 @@
 # Documake
 
-Company documents, minus the busywork. Pick a template — invoice, quote, NDA,
-or questionnaire — fill in a form, and download a polished PDF. Your company
-details are entered once in Settings and pre-filled everywhere.
+Company documents, minus the busywork. Pick a template — invoice, quote,
+statement of work, NDA, or questionnaire — fill in a form, and download a
+polished PDF. Your company details are entered once in Settings and pre-filled
+everywhere.
 
 Everything is stored locally in your browser (localStorage). No accounts, no
 server, no data leaves your machine.
@@ -78,8 +79,8 @@ curl -X POST http://localhost:3000/api/render \
   }'
 ```
 
-`type` is `invoice`, `quote`, `nda`, or `questionnaire`, and `data` is validated
-against that type's schema. `profile` and `filename` are optional. Success returns the
+`type` is `invoice`, `quote`, `sow`, `nda`, or `questionnaire`, and `data` is
+validated against that type's schema. `profile` and `filename` are optional. Success returns the
 PDF; any failure returns `{ success, data, error }` with a 400, 401, or 500.
 
 **Authentication** is off until you configure it. Set
@@ -93,9 +94,12 @@ only your own machine can reach the endpoint — set it anywhere else.
 npm test
 ```
 
-Vitest covers the invoice math (rounding, clamping, float safety) and schema
-parsing/factories. `scripts/render-samples.tsx` renders sample PDFs from all
-three templates for visual inspection:
+Vitest covers the money arithmetic (rounding, clamping, float safety), schema
+parsing and factories, storage migrations, profile operations, PDF theming, and
+the render API end to end.
+
+`scripts/render-samples.tsx` renders a sample of each template, plus one
+invoice per brand preset, for visual inspection:
 
 ```bash
 npx tsx scripts/render-samples.tsx out/
@@ -103,15 +107,17 @@ npx tsx scripts/render-samples.tsx out/
 
 ## Notes
 
-- The NDA is a general template, not legal advice — have a lawyer review it
-  before relying on it.
+- The NDA and SOW are general templates, not legal advice — have a lawyer
+  review them before relying on them. Neither ships with pre-written terms:
+  scope, assumptions, and change control are yours to write.
 - Documents live only in the browser that created them. Clearing site data
   deletes them; export anything you need as PDF.
 
 ## Roadmap ideas
 
 - Company logo on invoices
-- More templates (proposal, receipt, employment offer)
+- Embedded brand fonts alongside the standard PDF families
+- More templates (receipt, employment offer)
 - DOCX export alongside PDF
 - Cloud sync / multi-device (would need a backend)
 - E-signature flow for NDAs

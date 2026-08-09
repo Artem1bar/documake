@@ -1,5 +1,6 @@
 import { addDaysIso, todayIso } from "./format";
 import { QUOTE_VALIDITY_DAYS } from "./quote";
+import { DEFAULT_MILESTONE_SPLIT } from "./sow";
 import type { CompanyProfile, Doc, LineItem, Question } from "./types";
 import { CompanyProfileSchema } from "./types";
 
@@ -77,6 +78,42 @@ export function createQuoteDoc(profile: CompanyProfile): Doc {
   };
 }
 
+export function createSowDoc(profile: CompanyProfile): Doc {
+  const now = new Date().toISOString();
+  return {
+    id: newId(),
+    type: "sow",
+    title: "Statement of Work",
+    createdAt: now,
+    updatedAt: now,
+    data: {
+      sowNumber: "",
+      effectiveDate: todayIso(),
+      projectName: "",
+      clientName: "",
+      clientAddress: "",
+      background: "",
+      scope: "",
+      outOfScope: "",
+      // A payment shape to edit, with no fee behind it yet.
+      milestones: DEFAULT_MILESTONE_SPLIT.map((paymentPercent) => ({
+        id: newId(),
+        name: "",
+        deliverables: "",
+        dueDate: "",
+        paymentPercent,
+      })),
+      totalFee: 0,
+      currency: profile.currency,
+      // Left empty on purpose: assumptions and change control are the author's
+      // words, not boilerplate this app should put in their mouth.
+      assumptions: "",
+      changeControl: "",
+      governingLaw: profile.defaultGoverningLaw,
+    },
+  };
+}
+
 export function createNdaDoc(profile: CompanyProfile): Doc {
   const now = new Date().toISOString();
   return {
@@ -148,6 +185,8 @@ export function createDoc(type: Doc["type"], profile: CompanyProfile): Doc {
       return createInvoiceDoc(profile);
     case "quote":
       return createQuoteDoc(profile);
+    case "sow":
+      return createSowDoc(profile);
     case "nda":
       return createNdaDoc(profile);
     case "questionnaire":

@@ -30,6 +30,13 @@ const TEMPLATES: readonly TemplateCard[] = [
     icon: "→",
   },
   {
+    type: "sow",
+    title: "SOW",
+    description: "Agree scope, deliverables, milestones, and a payment schedule.",
+    accent: "bg-violet-100 text-violet-700",
+    icon: "≡",
+  },
+  {
     type: "nda",
     title: "NDA",
     description: "Protect confidential information with a mutual or one-way NDA.",

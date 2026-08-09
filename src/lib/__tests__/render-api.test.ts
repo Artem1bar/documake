@@ -158,6 +158,39 @@ describe("POST /api/render", () => {
     );
   });
 
+  it("renders a statement of work", async () => {
+    await expectPdf(
+      await post({
+        type: "sow",
+        data: {
+          sowNumber: "SOW-0001",
+          effectiveDate: "2026-08-09",
+          projectName: "Marketing site redesign",
+          clientName: "Acme Corp",
+          scope: "Design and build a five-page marketing site.",
+          milestones: [
+            { id: "1", name: "Discovery", deliverables: "Brief", dueDate: "2026-08-20", paymentPercent: 40 },
+            { id: "2", name: "Build", deliverables: "Staging site", dueDate: "2026-09-20", paymentPercent: 60 },
+          ],
+          totalFee: 10000,
+          currency: "USD",
+        },
+      }),
+    );
+  });
+
+  it("renders a statement of work whose fee is not set yet", async () => {
+    await expectPdf(
+      await post({
+        type: "sow",
+        data: {
+          projectName: "Scoping engagement",
+          milestones: [{ id: "1", name: "Discovery", deliverables: "", dueDate: "", paymentPercent: 100 }],
+        },
+      }),
+    );
+  });
+
   it("renders a questionnaire", async () => {
     const response = await post({
       type: "questionnaire",

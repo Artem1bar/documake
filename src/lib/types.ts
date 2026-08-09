@@ -92,6 +92,33 @@ export const QuoteDataSchema = z.object({
 });
 export type QuoteData = z.infer<typeof QuoteDataSchema>;
 
+export const MilestoneSchema = z.object({
+  id: z.string(),
+  name: z.string().default(""),
+  deliverables: z.string().default(""),
+  dueDate: z.string().default(""),
+  paymentPercent: z.number().min(0).max(100).default(0),
+});
+export type Milestone = z.infer<typeof MilestoneSchema>;
+
+export const SowDataSchema = z.object({
+  sowNumber: z.string().default(""),
+  effectiveDate: z.string().default(""),
+  projectName: z.string().default(""),
+  clientName: z.string().default(""),
+  clientAddress: z.string().default(""),
+  background: z.string().default(""),
+  scope: z.string().default(""),
+  outOfScope: z.string().default(""),
+  milestones: z.array(MilestoneSchema).default([]),
+  totalFee: z.number().min(0).default(0),
+  currency: z.string().default("USD"),
+  assumptions: z.string().default(""),
+  changeControl: z.string().default(""),
+  governingLaw: z.string().default(""),
+});
+export type SowData = z.infer<typeof SowDataSchema>;
+
 export const NdaDataSchema = z.object({
   effectiveDate: z.string().default(""),
   isMutual: z.boolean().default(true),
@@ -138,6 +165,7 @@ const docMeta = {
 export const DocSchema = z.discriminatedUnion("type", [
   z.object({ ...docMeta, type: z.literal("invoice"), data: InvoiceDataSchema }),
   z.object({ ...docMeta, type: z.literal("quote"), data: QuoteDataSchema }),
+  z.object({ ...docMeta, type: z.literal("sow"), data: SowDataSchema }),
   z.object({ ...docMeta, type: z.literal("nda"), data: NdaDataSchema }),
   z.object({
     ...docMeta,
@@ -151,6 +179,7 @@ export type DocType = Doc["type"];
 export const DOC_TYPES: readonly DocType[] = [
   "invoice",
   "quote",
+  "sow",
   "nda",
   "questionnaire",
 ] as const;
@@ -158,6 +187,7 @@ export const DOC_TYPES: readonly DocType[] = [
 export const DOC_TYPE_LABELS: Record<DocType, string> = {
   invoice: "Invoice",
   quote: "Quote",
+  sow: "SOW",
   nda: "NDA",
   questionnaire: "Questionnaire",
 };

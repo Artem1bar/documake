@@ -6,6 +6,7 @@ import { InvoicePdf } from "./InvoicePdf";
 import { NdaPdf } from "./NdaPdf";
 import { QuestionnairePdf } from "./QuestionnairePdf";
 import { QuotePdf } from "./QuotePdf";
+import { SowPdf } from "./SowPdf";
 import { createPdfTheme } from "./theme";
 
 /** Single entry point mapping a stored document to its PDF template. */
@@ -21,6 +22,8 @@ export function renderDocumentPdf(
         return <InvoicePdf profile={profile} data={doc.data} theme={theme} />;
       case "quote":
         return <QuotePdf profile={profile} data={doc.data} theme={theme} />;
+      case "sow":
+        return <SowPdf profile={profile} data={doc.data} theme={theme} />;
       case "nda":
         return <NdaPdf profile={profile} data={doc.data} theme={theme} />;
       case "questionnaire":
