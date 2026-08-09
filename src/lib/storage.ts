@@ -1,48 +1,29 @@
-import { DEFAULT_PROFILE } from "./factories";
+import { createLocalStorageAdapter } from "./persistence/adapter";
+import { DOCS_CODEC, PROFILE_CODEC } from "./persistence/codecs";
+import { readVersioned, writeVersioned } from "./persistence/versioning";
 import type { CompanyProfile, Doc } from "./types";
-import { CompanyProfileSchema, DocSchema } from "./types";
 
-const PROFILE_KEY = "documake.profile.v1";
-const DOCS_KEY = "documake.docs.v1";
+/**
+ * The one place a backend is chosen. Swapping this for a SQLite or hub-backed
+ * adapter is the whole point of the seam; nothing below this line knows where
+ * the bytes live.
+ */
+const adapter = createLocalStorageAdapter();
 
 /** Parses unknown JSON into a profile, falling back to defaults on bad data. */
 export function parseProfile(raw: unknown): CompanyProfile {
-  const result = CompanyProfileSchema.safeParse(raw);
-  return result.success ? result.data : DEFAULT_PROFILE;
+  return PROFILE_CODEC.parse(raw) ?? PROFILE_CODEC.fallback;
 }
 
 /** Parses unknown JSON into a doc list, dropping entries that fail validation. */
 export function parseDocs(raw: unknown): Doc[] {
-  if (!Array.isArray(raw)) return [];
-  return raw
-    .map((entry) => DocSchema.safeParse(entry))
-    .filter((result) => result.success)
-    .map((result) => result.data);
-}
-
-function readJson(key: string): unknown {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeJson(key: string, value: unknown): void {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // Storage full or unavailable; the in-memory state still works.
-  }
+  return DOCS_CODEC.parse(raw) ?? DOCS_CODEC.fallback;
 }
 
 /**
- * In-memory mirror of localStorage. Snapshots keep stable references between
- * writes so useSyncExternalStore can compare them cheaply; every write below
- * replaces the cache immutably and notifies subscribers.
+ * In-memory mirror of the persisted state. Snapshots keep stable references
+ * between writes so useSyncExternalStore can compare them cheaply; every write
+ * below replaces the cache immutably and notifies subscribers.
  */
 let docsCache: Doc[] | null = null;
 let profileCache: CompanyProfile | null = null;
@@ -60,12 +41,12 @@ export function subscribeToStore(listener: () => void): () => void {
 }
 
 export function getDocsSnapshot(): Doc[] {
-  docsCache ??= parseDocs(readJson(DOCS_KEY));
+  docsCache ??= readVersioned(adapter, DOCS_CODEC);
   return docsCache;
 }
 
 export function getProfileSnapshot(): CompanyProfile {
-  profileCache ??= parseProfile(readJson(PROFILE_KEY));
+  profileCache ??= readVersioned(adapter, PROFILE_CODEC);
   return profileCache;
 }
 
@@ -79,7 +60,7 @@ export function getDoc(id: string): Doc | null {
 
 export function saveProfile(profile: CompanyProfile): void {
   profileCache = profile;
-  writeJson(PROFILE_KEY, profile);
+  writeVersioned(adapter, PROFILE_CODEC, profile);
   notify();
 }
 
@@ -87,12 +68,12 @@ export function saveProfile(profile: CompanyProfile): void {
 export function upsertDoc(doc: Doc): void {
   const others = getDocsSnapshot().filter((existing) => existing.id !== doc.id);
   docsCache = [doc, ...others];
-  writeJson(DOCS_KEY, docsCache);
+  writeVersioned(adapter, DOCS_CODEC, docsCache);
   notify();
 }
 
 export function deleteDoc(id: string): void {
   docsCache = getDocsSnapshot().filter((doc) => doc.id !== id);
-  writeJson(DOCS_KEY, docsCache);
+  writeVersioned(adapter, DOCS_CODEC, docsCache);
   notify();
 }
