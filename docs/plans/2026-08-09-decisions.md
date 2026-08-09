@@ -52,6 +52,57 @@ One line per judgment call: what, why, and what it costs to reverse.
   untrusted input; losing it should not take the app down with it.
   *Reverse: free.*
 
+## CP0 — answered without Artem, on his instruction to keep going
+
+He asked to continue rather than wait, so these are my calls under the plan's
+fence. All four are cheap to reverse; say the word and they change.
+
+- **Q1 — merge policy: not merging.** Everything stays on `feat/2026-08-09`.
+  The plan says merging is his call, and continuing to build does not require
+  making it. *Reverse: n/a — nothing to undo.*
+- **Q2 — brand profiles: no invented client data.** The migration turns the
+  existing company profile into the first profile, and that is the only real
+  data in the system. Preset brands ship in T3 as *style* presets — colour and
+  type only, labelled "Sample", with company identity left blank — so nothing
+  fabricates an address, tax ID, or client. *Reverse: cheap.*
+- **Q3 — fonts: the three standard PDF families** (Helvetica, Times, Courier)
+  rather than embedded brand faces. Verified in `@react-pdf/font`: these need
+  no font files, so documents render identically offline and on any machine,
+  and there is nothing to license or ship. It gives real typographic contrast
+  today; `FontFamilySchema` takes new members when actual font files show up.
+  *Reverse: cheap — embedding is additive.*
+- **Q4 — money slots stay blank/"TBD".** Fence holds; Weblux pricing is still
+  an open business decision. *Reverse: n/a.*
+
+## T2 — multi-brand profiles
+
+- **Profile operations live in `profile-store.ts` as pure functions**;
+  `storage.ts` only caches and persists. Every operation returns a new store,
+  which both satisfies the immutability rule and lets `useSyncExternalStore`
+  compare snapshots by reference. *Reverse: free.*
+- **The migrated and first-run profile share a fixed id, `"default"`.** A
+  random id would make the migration non-deterministic and untestable.
+  *Reverse: free.*
+- **The migrated profile is labelled from its company name**, falling back to
+  "My company" when that is blank — better than "Untitled" for the one profile
+  a migrating user already has. *Reverse: free.*
+- **`normalizeStore` runs inside the codec's `parse`,** so a store with zero
+  profiles or a dangling active id cannot escape storage into the app. The
+  invariant is enforced at the boundary rather than defended at every read.
+  *Reverse: free.*
+- **Deleting the last profile is refused, not confirmed.** There is no sensible
+  empty state — every document needs a profile to render. The button is
+  disabled with a reason rather than failing on click. *Reverse: free.*
+- **Adding a profile switches to it**, since that is invariably why you added
+  one. *Reverse: free.*
+- **Branding fields land in T2; the branding UI lands in T3.** Shipping a
+  colour picker that changes nothing would put a commit below the bar, so the
+  schema gains the fields (the migration needs them) and the controls arrive
+  with the rendering that honours them. *Reverse: free.*
+- **`parseProfile` kept its old meaning** — parse one `CompanyProfile` — while
+  the codec now yields a whole store. Renaming it would have churned a tested
+  helper for no gain. *Reverse: free.*
+
 ## T5 — render API
 
 - **Built T5 before T2/T3/T4** because it was the only remaining task with no

@@ -4,9 +4,10 @@ import { useSyncExternalStore } from "react";
 import {
   getDocsSnapshot,
   getProfileSnapshot,
+  getProfileStoreSnapshot,
   subscribeToStore,
 } from "./storage";
-import type { CompanyProfile, Doc } from "./types";
+import type { BrandProfile, Doc, ProfileStore } from "./types";
 
 const getServerSnapshot = () => null;
 
@@ -19,11 +20,20 @@ export function useDocs(): Doc[] | null {
   );
 }
 
-/** Reactive company profile; null while server-rendering and hydrating. */
-export function useProfile(): CompanyProfile | null {
-  return useSyncExternalStore<CompanyProfile | null>(
+/** The active brand profile; null while server-rendering and hydrating. */
+export function useProfile(): BrandProfile | null {
+  return useSyncExternalStore<BrandProfile | null>(
     subscribeToStore,
     getProfileSnapshot,
+    getServerSnapshot,
+  );
+}
+
+/** Every profile plus the active id; null while server-rendering and hydrating. */
+export function useProfileStore(): ProfileStore | null {
+  return useSyncExternalStore<ProfileStore | null>(
+    subscribeToStore,
+    getProfileStoreSnapshot,
     getServerSnapshot,
   );
 }

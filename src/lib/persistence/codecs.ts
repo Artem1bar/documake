@@ -1,13 +1,16 @@
-import { DEFAULT_PROFILE } from "../factories";
-import type { CompanyProfile, Doc } from "../types";
-import { CompanyProfileSchema, DocSchema } from "../types";
+import { DEFAULT_PROFILE_STORE } from "../profile-defaults";
+import { migrateProfileV1ToV2, normalizeStore } from "../profile-store";
+import type { Doc, ProfileStore } from "../types";
+import { DocSchema, ProfileStoreSchema } from "../types";
 import type { VersionedCodec } from "./versioning";
 
 /**
  * Bump a version whenever the persisted shape changes, and add the matching
  * migration alongside it — `readVersioned` refuses to guess across a gap.
+ *
+ * Profile v2 replaced the single company profile with a list plus an active id.
  */
-export const PROFILE_VERSION = 1;
+export const PROFILE_VERSION = 2;
 export const DOCS_VERSION = 1;
 
 /**
@@ -18,15 +21,15 @@ export const DOCS_VERSION = 1;
 const LEGACY_PROFILE_KEY = "documake.profile.v1";
 const LEGACY_DOCS_KEY = "documake.docs.v1";
 
-export const PROFILE_CODEC: VersionedCodec<CompanyProfile> = {
+export const PROFILE_CODEC: VersionedCodec<ProfileStore> = {
   key: "documake.profile",
   version: PROFILE_VERSION,
-  migrations: {},
+  migrations: { 1: migrateProfileV1ToV2 },
   legacyKeys: [LEGACY_PROFILE_KEY],
-  fallback: DEFAULT_PROFILE,
+  fallback: DEFAULT_PROFILE_STORE,
   parse: (raw) => {
-    const result = CompanyProfileSchema.safeParse(raw);
-    return result.success ? result.data : null;
+    const result = ProfileStoreSchema.safeParse(raw);
+    return result.success ? normalizeStore(result.data) : null;
   },
 };
 

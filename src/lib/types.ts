@@ -15,6 +15,37 @@ export const CompanyProfileSchema = z.object({
 });
 export type CompanyProfile = z.infer<typeof CompanyProfileSchema>;
 
+/**
+ * The three standard PDF font families. They need no embedding and no font
+ * files, so documents render identically offline and on any machine. Embedded
+ * brand fonts can be added later as extra members here.
+ */
+export const FontFamilySchema = z.enum(["helvetica", "times", "courier"]);
+export type FontFamily = z.infer<typeof FontFamilySchema>;
+
+export const BrandingSchema = z.object({
+  accentColor: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/, "must be a six-digit hex colour, e.g. #002b72")
+    .default("#111827"),
+  fontFamily: FontFamilySchema.default("helvetica"),
+});
+export type Branding = z.infer<typeof BrandingSchema>;
+
+/** A company profile plus the identity and branding that distinguish it. */
+export const BrandProfileSchema = CompanyProfileSchema.extend({
+  id: z.string(),
+  label: z.string().default("Untitled profile"),
+  branding: BrandingSchema.default(() => BrandingSchema.parse({})),
+});
+export type BrandProfile = z.infer<typeof BrandProfileSchema>;
+
+export const ProfileStoreSchema = z.object({
+  profiles: z.array(BrandProfileSchema).default([]),
+  activeProfileId: z.string().default(""),
+});
+export type ProfileStore = z.infer<typeof ProfileStoreSchema>;
+
 export const LineItemSchema = z.object({
   id: z.string(),
   description: z.string().default(""),

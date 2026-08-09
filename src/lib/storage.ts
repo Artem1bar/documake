@@ -1,7 +1,17 @@
+import { DEFAULT_PROFILE } from "./factories";
 import { createLocalStorageAdapter } from "./persistence/adapter";
 import { DOCS_CODEC, PROFILE_CODEC } from "./persistence/codecs";
 import { readVersioned, writeVersioned } from "./persistence/versioning";
-import type { CompanyProfile, Doc } from "./types";
+import {
+  activateProfile,
+  activeProfile,
+  addProfile,
+  makeProfile,
+  removeProfile,
+  upsertProfile,
+} from "./profile-store";
+import type { BrandProfile, CompanyProfile, Doc, ProfileStore } from "./types";
+import { CompanyProfileSchema } from "./types";
 
 /**
  * The one place a backend is chosen. Swapping this for a SQLite or hub-backed
@@ -10,9 +20,10 @@ import type { CompanyProfile, Doc } from "./types";
  */
 const adapter = createLocalStorageAdapter();
 
-/** Parses unknown JSON into a profile, falling back to defaults on bad data. */
+/** Parses unknown JSON into a company profile, falling back to defaults. */
 export function parseProfile(raw: unknown): CompanyProfile {
-  return PROFILE_CODEC.parse(raw) ?? PROFILE_CODEC.fallback;
+  const result = CompanyProfileSchema.safeParse(raw);
+  return result.success ? result.data : DEFAULT_PROFILE;
 }
 
 /** Parses unknown JSON into a doc list, dropping entries that fail validation. */
@@ -26,7 +37,7 @@ export function parseDocs(raw: unknown): Doc[] {
  * below replaces the cache immutably and notifies subscribers.
  */
 let docsCache: Doc[] | null = null;
-let profileCache: CompanyProfile | null = null;
+let profileStoreCache: ProfileStore | null = null;
 const listeners = new Set<() => void>();
 
 function notify(): void {
@@ -45,12 +56,18 @@ export function getDocsSnapshot(): Doc[] {
   return docsCache;
 }
 
-export function getProfileSnapshot(): CompanyProfile {
-  profileCache ??= readVersioned(adapter, PROFILE_CODEC);
-  return profileCache;
+export function getProfileStoreSnapshot(): ProfileStore {
+  profileStoreCache ??= readVersioned(adapter, PROFILE_CODEC);
+  return profileStoreCache;
 }
 
-export function loadProfile(): CompanyProfile {
+/** The active profile. A member of the cached store, so its reference is
+ *  stable until the store itself changes. */
+export function getProfileSnapshot(): BrandProfile {
+  return activeProfile(getProfileStoreSnapshot());
+}
+
+export function loadProfile(): BrandProfile {
   return getProfileSnapshot();
 }
 
@@ -58,10 +75,33 @@ export function getDoc(id: string): Doc | null {
   return getDocsSnapshot().find((doc) => doc.id === id) ?? null;
 }
 
-export function saveProfile(profile: CompanyProfile): void {
-  profileCache = profile;
-  writeVersioned(adapter, PROFILE_CODEC, profile);
+function commitProfileStore(next: ProfileStore): void {
+  profileStoreCache = next;
+  writeVersioned(adapter, PROFILE_CODEC, next);
   notify();
+}
+
+export function saveProfile(profile: BrandProfile): void {
+  commitProfileStore(upsertProfile(getProfileStoreSnapshot(), profile));
+}
+
+export function setActiveProfile(id: string): void {
+  commitProfileStore(activateProfile(getProfileStoreSnapshot(), id));
+}
+
+/** Creates a profile, switches to it, and hands it back to the caller. */
+export function createProfile(
+  label: string,
+  overrides: Partial<BrandProfile> = {},
+): BrandProfile {
+  const profile = makeProfile(label, overrides);
+  commitProfileStore(addProfile(getProfileStoreSnapshot(), profile));
+  return profile;
+}
+
+/** No-op when `id` is the last remaining profile. */
+export function deleteProfile(id: string): void {
+  commitProfileStore(removeProfile(getProfileStoreSnapshot(), id));
 }
 
 /** Inserts or replaces a doc, keeping the list sorted by most recently updated. */

@@ -8,9 +8,15 @@ import {
   TextArea,
   TextInput,
 } from "@/components/fields";
-import { saveProfile } from "@/lib/storage";
-import { useProfile } from "@/lib/store-hooks";
-import type { CompanyProfile } from "@/lib/types";
+import { ProfileSwitcher } from "@/components/ProfileSwitcher";
+import {
+  createProfile,
+  deleteProfile,
+  saveProfile,
+  setActiveProfile,
+} from "@/lib/storage";
+import { useProfileStore } from "@/lib/store-hooks";
+import type { BrandProfile } from "@/lib/types";
 
 const CURRENCIES = [
   "USD", "EUR", "GBP", "CAD", "AUD", "CHF",
@@ -18,17 +24,26 @@ const CURRENCIES = [
 ] as const;
 
 export default function SettingsPage() {
-  const profile = useProfile();
+  const store = useProfileStore();
 
-  if (profile === null) {
+  if (store === null) {
     return <p className="text-sm text-neutral-400">Loading…</p>;
   }
 
-  const set = <K extends keyof CompanyProfile>(
+  const profile =
+    store.profiles.find((entry) => entry.id === store.activeProfileId) ??
+    store.profiles[0];
+
+  const set = <K extends keyof BrandProfile>(
     key: K,
-    value: CompanyProfile[K],
+    value: BrandProfile[K],
   ) => {
     saveProfile({ ...profile, [key]: value });
+  };
+
+  const handleDelete = () => {
+    if (!window.confirm(`Delete the profile "${profile.label}"?`)) return;
+    deleteProfile(profile.id);
   };
 
   return (
@@ -40,6 +55,19 @@ export default function SettingsPage() {
           automatically to this browser.
         </p>
       </div>
+
+      <SectionCard
+        title="Profile"
+        description="Keep separate details for each company or brand you send documents from."
+      >
+        <ProfileSwitcher
+          store={store}
+          onSelect={setActiveProfile}
+          onCreate={() => createProfile("New profile")}
+          onDelete={handleDelete}
+          onRename={(label) => set("label", label)}
+        />
+      </SectionCard>
 
       <SectionCard title="Company">
         <Field label="Company name">
