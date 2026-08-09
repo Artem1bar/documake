@@ -51,3 +51,40 @@ One line per judgment call: what, why, and what it costs to reverse.
   validation, missing migration — yields the codec's fallback. Stored data is
   untrusted input; losing it should not take the app down with it.
   *Reverse: free.*
+
+## T5 — render API
+
+- **Built T5 before T2/T3/T4** because it was the only remaining task with no
+  open CP0 question. Its one coupling to T2 is the `profile` field, and a
+  stateless endpoint takes a single profile object regardless of how many
+  profiles the app stores. *Reverse: n/a.*
+- **Logic lives in `src/lib/render-request.ts`; the route handler is a thin
+  adapter.** Keeps the handler readable and lets validation, auth, and filename
+  rules be unit-tested without constructing HTTP traffic. *Reverse: free.*
+- **Auth is checked before JSON parsing and validation.** An unauthenticated
+  caller learns nothing about the payload shape and cannot spend server CPU on
+  a render. *Reverse: free.*
+- **Bearer comparison is constant-time over SHA-256 digests.** Hashing first
+  means both sides are always 32 bytes, which `timingSafeEqual` requires, and
+  avoids leaking the secret's length. *Reverse: free.*
+- **Endpoint is open when `DOCUMAKE_RENDER_SECRET` is unset**, following the
+  hub's `CRON_SECRET` pattern. Local development needs no setup; anywhere the
+  app is reachable by others, the variable must be set. Documented in
+  `.env.example` and the README. *Reverse: free — but note the failure mode is
+  open-by-default, so deployment needs to set it.*
+- **Filenames are rejected, not sanitized,** when they fall outside
+  `[A-Za-z0-9 ._-]`. The value lands in a `Content-Disposition` header where a
+  quote or newline is header injection; a clear 400 beats silently mangling the
+  caller's input. *Reverse: free.*
+- **Errors use the house JSON envelope; success returns raw PDF bytes.** A
+  binary endpoint cannot wrap its success payload in JSON, so the envelope
+  applies to the failure path only. *Reverse: free.*
+- **Render failures return a generic 500.** The payload already validated, so a
+  throw here is a template or renderer fault; the detail belongs in the server
+  log, not the response body. *Reverse: free.*
+- **Added `vitest.config.mts`** for the `@/` path alias, so tests can import
+  application modules the way the application does. `.mts` rather than `.ts`
+  because Vite's native config loader warns on ESM-in-CJS. *Reverse: free.*
+- **Added `!.env.example` to `.gitignore`.** The existing `.env*` rule would
+  otherwise have swallowed the one env file that is meant to be committed.
+  *Reverse: free.*
