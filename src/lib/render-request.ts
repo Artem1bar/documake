@@ -5,6 +5,7 @@ import {
   InvoiceDataSchema,
   NdaDataSchema,
   QuestionnaireDataSchema,
+  QuoteDataSchema,
   RenderProfileSchema,
 } from "./types";
 
@@ -27,6 +28,7 @@ const renderBase = {
 
 export const RenderRequestSchema = z.discriminatedUnion("type", [
   z.object({ ...renderBase, type: z.literal("invoice"), data: InvoiceDataSchema }),
+  z.object({ ...renderBase, type: z.literal("quote"), data: QuoteDataSchema }),
   z.object({ ...renderBase, type: z.literal("nda"), data: NdaDataSchema }),
   z.object({
     ...renderBase,
@@ -53,6 +55,8 @@ export function toDoc(request: RenderRequest): Doc {
   switch (request.type) {
     case "invoice":
       return { ...meta, type: "invoice", data: request.data };
+    case "quote":
+      return { ...meta, type: "quote", data: request.data };
     case "nda":
       return { ...meta, type: "nda", data: request.data };
     case "questionnaire":

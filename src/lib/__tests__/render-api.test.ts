@@ -128,6 +128,36 @@ describe("POST /api/render", () => {
     await expectPdf(await post({ type: "nda", data: ndaData }));
   });
 
+  it("renders a quote", async () => {
+    await expectPdf(
+      await post({
+        type: "quote",
+        data: {
+          quoteNumber: "Q-0001",
+          issueDate: "2026-08-09",
+          validUntil: "2026-09-08",
+          clientName: "Acme Corp",
+          summary: "A redesign delivered in three phases.",
+          items: [{ id: "1", description: "Discovery", quantity: 1, unitPrice: 2000 }],
+          terms: "50% on acceptance, 50% on delivery.",
+          currency: "USD",
+        },
+      }),
+    );
+  });
+
+  it("renders a quote whose lines carry no prices yet", async () => {
+    await expectPdf(
+      await post({
+        type: "quote",
+        data: {
+          clientName: "Acme Corp",
+          items: [{ id: "1", description: "Scope to be agreed", quantity: 1, unitPrice: 0 }],
+        },
+      }),
+    );
+  });
+
   it("renders a questionnaire", async () => {
     const response = await post({
       type: "questionnaire",

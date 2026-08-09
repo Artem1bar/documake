@@ -1,7 +1,7 @@
 # Documake
 
-Company documents, minus the busywork. Pick a template — invoice, NDA, or
-questionnaire — fill in a form, and download a polished PDF. Your company
+Company documents, minus the busywork. Pick a template — invoice, quote, NDA,
+or questionnaire — fill in a form, and download a polished PDF. Your company
 details are entered once in Settings and pre-filled everywhere.
 
 Everything is stored locally in your browser (localStorage). No accounts, no
@@ -78,8 +78,8 @@ curl -X POST http://localhost:3000/api/render \
   }'
 ```
 
-`type` is `invoice`, `nda`, or `questionnaire`, and `data` is validated against
-that type's schema. `profile` and `filename` are optional. Success returns the
+`type` is `invoice`, `quote`, `nda`, or `questionnaire`, and `data` is validated
+against that type's schema. `profile` and `filename` are optional. Success returns the
 PDF; any failure returns `{ success, data, error }` with a 400, 401, or 500.
 
 **Authentication** is off until you configure it. Set

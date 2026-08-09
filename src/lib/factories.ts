@@ -1,4 +1,5 @@
 import { addDaysIso, todayIso } from "./format";
+import { QUOTE_VALIDITY_DAYS } from "./quote";
 import type { CompanyProfile, Doc, LineItem, Question } from "./types";
 import { CompanyProfileSchema } from "./types";
 
@@ -42,6 +43,36 @@ export function createInvoiceDoc(profile: CompanyProfile): Doc {
       discount: 0,
       notes: "",
       currency: profile.currency,
+    },
+  };
+}
+
+export function createQuoteDoc(profile: CompanyProfile): Doc {
+  const now = new Date().toISOString();
+  const issueDate = todayIso();
+  return {
+    id: newId(),
+    type: "quote",
+    title: "Quote",
+    createdAt: now,
+    updatedAt: now,
+    data: {
+      // Quotes are numbered independently of invoices, so drafting one never
+      // consumes an invoice number.
+      quoteNumber: "",
+      issueDate,
+      validUntil: addDaysIso(issueDate, QUOTE_VALIDITY_DAYS),
+      clientName: "",
+      clientAddress: "",
+      clientEmail: "",
+      summary: "",
+      items: [emptyLineItem()],
+      taxRate: profile.defaultTaxRate,
+      discount: 0,
+      currency: profile.currency,
+      terms: "",
+      notes: "",
+      showAcceptance: true,
     },
   };
 }
@@ -115,6 +146,8 @@ export function createDoc(type: Doc["type"], profile: CompanyProfile): Doc {
   switch (type) {
     case "invoice":
       return createInvoiceDoc(profile);
+    case "quote":
+      return createQuoteDoc(profile);
     case "nda":
       return createNdaDoc(profile);
     case "questionnaire":

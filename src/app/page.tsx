@@ -23,6 +23,13 @@ const TEMPLATES: readonly TemplateCard[] = [
     icon: "$",
   },
   {
+    type: "quote",
+    title: "Quote",
+    description: "Propose work with line items, a validity date, and an acceptance line.",
+    accent: "bg-sky-100 text-sky-700",
+    icon: "→",
+  },
+  {
     type: "nda",
     title: "NDA",
     description: "Protect confidential information with a mutual or one-way NDA.",

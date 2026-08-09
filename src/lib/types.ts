@@ -74,6 +74,24 @@ export const InvoiceDataSchema = z.object({
 });
 export type InvoiceData = z.infer<typeof InvoiceDataSchema>;
 
+export const QuoteDataSchema = z.object({
+  quoteNumber: z.string().default(""),
+  issueDate: z.string().default(""),
+  validUntil: z.string().default(""),
+  clientName: z.string().default(""),
+  clientAddress: z.string().default(""),
+  clientEmail: z.string().default(""),
+  summary: z.string().default(""),
+  items: z.array(LineItemSchema).default([]),
+  taxRate: z.number().default(0),
+  discount: z.number().default(0),
+  currency: z.string().default("USD"),
+  terms: z.string().default(""),
+  notes: z.string().default(""),
+  showAcceptance: z.boolean().default(true),
+});
+export type QuoteData = z.infer<typeof QuoteDataSchema>;
+
 export const NdaDataSchema = z.object({
   effectiveDate: z.string().default(""),
   isMutual: z.boolean().default(true),
@@ -119,6 +137,7 @@ const docMeta = {
 
 export const DocSchema = z.discriminatedUnion("type", [
   z.object({ ...docMeta, type: z.literal("invoice"), data: InvoiceDataSchema }),
+  z.object({ ...docMeta, type: z.literal("quote"), data: QuoteDataSchema }),
   z.object({ ...docMeta, type: z.literal("nda"), data: NdaDataSchema }),
   z.object({
     ...docMeta,
@@ -131,12 +150,14 @@ export type DocType = Doc["type"];
 
 export const DOC_TYPES: readonly DocType[] = [
   "invoice",
+  "quote",
   "nda",
   "questionnaire",
 ] as const;
 
 export const DOC_TYPE_LABELS: Record<DocType, string> = {
   invoice: "Invoice",
+  quote: "Quote",
   nda: "NDA",
   questionnaire: "Questionnaire",
 };

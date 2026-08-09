@@ -103,6 +103,28 @@ fence. All four are cheap to reverse; say the word and they change.
   the codec now yields a whole store. Renaming it would have churned a tested
   helper for no gain. *Reverse: free.*
 
+## T4 — quote/proposal template
+
+- **An unpriced line prints "TBD", not "$0.00".** A quote is written before the
+  numbers are settled, and a quote that says $0.00 says the work is free. Per
+  line, and for the totals when nothing is priced yet. This is the fence's
+  "money slots blank/TBD" rule made concrete. *Reverse: cheap.*
+- **A partly-priced quote still totals the priced lines.** Suppressing the
+  total until every line is filled would make the common case — some scope
+  priced, some to be scoped — useless. *Reverse: free.*
+- **Quotes are numbered independently of invoices, and the number is
+  optional.** Drafting a quote must not consume an invoice number; a tested
+  assertion covers it. *Reverse: cheap.*
+- **Line arithmetic is `invoice-math`, untouched.** Same integer-cent rounding,
+  same clamping, one implementation to trust. *Reverse: n/a.*
+- **30-day default validity**, exported as `QUOTE_VALIDITY_DAYS` rather than
+  buried in the factory. *Reverse: free.*
+- **The acceptance block is on by default but can be turned off**, because a
+  quote sent for budgeting is not a quote sent for signature. *Reverse: free.*
+- **No default terms text.** Payment schedules are a business decision, and
+  the fence forbids inventing one. The field ships empty with a placeholder
+  that shows the shape without asserting it. *Reverse: free.*
+
 ## T3 — PDF brand theming
 
 - **Only the accent colour and the typeface vary per profile.** Ink, muted,

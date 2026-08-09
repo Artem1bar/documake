@@ -7,6 +7,7 @@ import { DocBadge } from "@/components/DocBadge";
 import { InvoiceForm } from "@/components/forms/InvoiceForm";
 import { NdaForm } from "@/components/forms/NdaForm";
 import { QuestionnaireForm } from "@/components/forms/QuestionnaireForm";
+import { QuoteForm } from "@/components/forms/QuoteForm";
 import { deleteDoc, upsertDoc } from "@/lib/storage";
 import { useDocs, useProfile } from "@/lib/store-hooks";
 import type { Doc } from "@/lib/types";
@@ -84,6 +85,12 @@ export default function DocumentEditorPage() {
         <div>
           {doc.type === "invoice" ? (
             <InvoiceForm
+              data={doc.data}
+              onChange={(data) => update({ ...doc, data })}
+            />
+          ) : null}
+          {doc.type === "quote" ? (
+            <QuoteForm
               data={doc.data}
               onChange={(data) => update({ ...doc, data })}
             />

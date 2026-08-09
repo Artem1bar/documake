@@ -3,6 +3,7 @@ import { DOC_TYPE_LABELS } from "@/lib/types";
 
 const badgeStyles: Record<DocType, string> = {
   invoice: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+  quote: "bg-sky-50 text-sky-700 ring-sky-200",
   nda: "bg-indigo-50 text-indigo-700 ring-indigo-200",
   questionnaire: "bg-amber-50 text-amber-700 ring-amber-200",
 };
