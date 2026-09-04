@@ -8,13 +8,24 @@ everywhere.
 Everything is stored locally in your browser (localStorage). No accounts, no
 server, no data leaves your machine.
 
-## Run it
+![Invoice editor: form on the left, live PDF preview on the right](docs/screenshot.png)
+
+## Quickstart
+
+Requires Node 22.
 
 ```bash
+git clone https://github.com/Artem1bar/documake.git
+cd documake
+npm install
 npm run dev
 ```
 
-Then open the printed localhost URL. Production build: `npm run build && npm start`.
+Then open the printed localhost URL, pick a template, and fill in the form —
+the PDF preview updates as you type. No env vars are needed.
+
+Production build: `npm run build && npm start`. Checks: `npm test` (Vitest,
+134 tests) and `npm run lint`.
 
 ## How it works
 
@@ -121,6 +132,12 @@ npx tsx scripts/render-samples.tsx out/
 - DOCX export alongside PDF
 - Cloud sync / multi-device (would need a backend)
 - E-signature flow for NDAs
+
+## Status
+
+Working and in personal use. A fresh clone was verified on 2026-09-04: install,
+lint, tests, and production build all pass with no configuration. Not deployed
+publicly — it is local-first by design, so run it on your own machine.
 
 ---
 

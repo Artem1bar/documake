@@ -2,6 +2,7 @@
  * Renders sample PDFs from all three templates for visual inspection.
  * Usage: npx tsx scripts/render-samples.tsx <output-dir>
  */
+import { mkdirSync } from "node:fs";
 import { renderToFile } from "@react-pdf/renderer";
 import { InvoicePdf } from "../src/components/pdf/InvoicePdf";
 import { NdaPdf } from "../src/components/pdf/NdaPdf";
@@ -13,6 +14,7 @@ import { DEFAULT_BRANDING } from "../src/lib/profile-defaults";
 import type { CompanyProfile, InvoiceData, NdaData } from "../src/lib/types";
 
 const outDir = process.argv[2] ?? ".";
+mkdirSync(outDir, { recursive: true });
 const theme = createPdfTheme(DEFAULT_BRANDING);
 
 const profile: CompanyProfile = {
