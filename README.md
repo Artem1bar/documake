@@ -121,3 +121,7 @@ npx tsx scripts/render-samples.tsx out/
 - DOCX export alongside PDF
 - Cloud sync / multi-device (would need a backend)
 - E-signature flow for NDAs
+
+---
+
+Developed with [Claude Code](https://claude.com/claude-code) as the coding agent.

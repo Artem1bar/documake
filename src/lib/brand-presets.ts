@@ -11,10 +11,8 @@ export interface BrandPreset {
  * company details, so applying one never puts a name, address, or tax ID you
  * did not write into a document.
  *
- * Both accents are taken from sibling projects' own design tokens:
- *   - #002b72 — weblux `src/app/globals.css`, `--color-ink`
- *   - #bc4b00 — dave `packages/amber-ui/src/styles/ember.css`,
- *     `--accent-rgb: 188 75 0`
+ * The two accent colours are borrowed from sibling projects' own design tokens
+ * (a navy "ink" and a cognac "ember"); only the hex values are copied.
  */
 export const BRAND_PRESETS: readonly BrandPreset[] = [
   {
