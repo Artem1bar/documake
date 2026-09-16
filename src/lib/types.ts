@@ -1,4 +1,8 @@
 import { z } from "zod";
+import { ReportDataSchema } from "./report/schema";
+
+export { ReportDataSchema };
+export type { ReportData } from "./report/schema";
 
 export const CompanyProfileSchema = z.object({
   name: z.string().default(""),
@@ -172,6 +176,7 @@ export const DocSchema = z.discriminatedUnion("type", [
     type: z.literal("questionnaire"),
     data: QuestionnaireDataSchema,
   }),
+  z.object({ ...docMeta, type: z.literal("report"), data: ReportDataSchema }),
 ]);
 export type Doc = z.infer<typeof DocSchema>;
 export type DocType = Doc["type"];
@@ -182,6 +187,7 @@ export const DOC_TYPES: readonly DocType[] = [
   "sow",
   "nda",
   "questionnaire",
+  "report",
 ] as const;
 
 export const DOC_TYPE_LABELS: Record<DocType, string> = {
@@ -190,6 +196,7 @@ export const DOC_TYPE_LABELS: Record<DocType, string> = {
   sow: "SOW",
   nda: "NDA",
   questionnaire: "Questionnaire",
+  report: "Report",
 };
 
 export function isDocType(value: string): value is DocType {

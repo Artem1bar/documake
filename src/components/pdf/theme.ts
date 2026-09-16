@@ -13,6 +13,8 @@ export const hairline = "#e5e7eb";
 interface FontStack {
   regular: string;
   bold: string;
+  /** Used for quoted speech and the closing line of a report. */
+  oblique: string;
 }
 
 /**
@@ -21,9 +23,13 @@ interface FontStack {
  * brand faces would be added here alongside a `Font.register` call.
  */
 const FONT_STACKS: Record<FontFamily, FontStack> = {
-  helvetica: { regular: "Helvetica", bold: "Helvetica-Bold" },
-  times: { regular: "Times-Roman", bold: "Times-Bold" },
-  courier: { regular: "Courier", bold: "Courier-Bold" },
+  helvetica: {
+    regular: "Helvetica",
+    bold: "Helvetica-Bold",
+    oblique: "Helvetica-Oblique",
+  },
+  times: { regular: "Times-Roman", bold: "Times-Bold", oblique: "Times-Italic" },
+  courier: { regular: "Courier", bold: "Courier-Bold", oblique: "Courier-Oblique" },
 };
 
 function buildTheme(branding: Branding) {
@@ -110,6 +116,18 @@ export function createPdfTheme(branding: Branding): PdfTheme {
   const theme = buildTheme(branding);
   themeCache.set(key, theme);
   return theme;
+}
+
+/**
+ * Splits prose on blank lines, the way the author typed it. Unlike `toLines`,
+ * a single newline stays inside its paragraph — wrapping is the renderer's job,
+ * not the typist's.
+ */
+export function toParagraphs(value: string): string[] {
+  return value
+    .split(/\n\s*\n/)
+    .map((paragraph) => paragraph.trim())
+    .filter((paragraph) => paragraph.length > 0);
 }
 
 /** Splits a multiline string into trimmed, non-empty lines for <Text> rendering. */

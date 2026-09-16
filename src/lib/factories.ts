@@ -1,5 +1,7 @@
 import { addDaysIso, todayIso } from "./format";
 import { QUOTE_VALIDITY_DAYS } from "./quote";
+import { createReportData, REPORT_TEMPLATE_LABELS } from "./report/presets";
+import type { ReportTemplateId } from "./report/schema";
 import { DEFAULT_MILESTONE_SPLIT } from "./sow";
 import type { CompanyProfile, Doc, LineItem, Question } from "./types";
 import { CompanyProfileSchema } from "./types";
@@ -179,6 +181,22 @@ export function createQuestionnaireDoc(): Doc {
   };
 }
 
+/**
+ * Reports start from a preset — The Map by default, because it is the one
+ * document the whole engagement rests on and the one hand-built most often.
+ */
+export function createReportDoc(templateId: ReportTemplateId = "map"): Doc {
+  const now = new Date().toISOString();
+  return {
+    id: newId(),
+    type: "report",
+    title: REPORT_TEMPLATE_LABELS[templateId],
+    createdAt: now,
+    updatedAt: now,
+    data: { ...createReportData(templateId), documentDate: todayIso() },
+  };
+}
+
 export function createDoc(type: Doc["type"], profile: CompanyProfile): Doc {
   switch (type) {
     case "invoice":
@@ -191,5 +209,7 @@ export function createDoc(type: Doc["type"], profile: CompanyProfile): Doc {
       return createNdaDoc(profile);
     case "questionnaire":
       return createQuestionnaireDoc();
+    case "report":
+      return createReportDoc();
   }
 }

@@ -6,6 +6,7 @@ import { InvoicePdf } from "./InvoicePdf";
 import { NdaPdf } from "./NdaPdf";
 import { QuestionnairePdf } from "./QuestionnairePdf";
 import { QuotePdf } from "./QuotePdf";
+import { ReportPdf } from "./ReportPdf";
 import { SowPdf } from "./SowPdf";
 import { createPdfTheme } from "./theme";
 
@@ -30,6 +31,8 @@ export function renderDocumentPdf(
         return (
           <QuestionnairePdf profile={profile} data={doc.data} theme={theme} />
         );
+      case "report":
+        return <ReportPdf profile={profile} data={doc.data} theme={theme} />;
     }
   })();
   // Every template renders a react-pdf <Document> at its root, which the

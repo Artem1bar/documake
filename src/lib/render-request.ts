@@ -7,6 +7,7 @@ import {
   QuestionnaireDataSchema,
   QuoteDataSchema,
   RenderProfileSchema,
+  ReportDataSchema,
   SowDataSchema,
 } from "./types";
 
@@ -37,6 +38,7 @@ export const RenderRequestSchema = z.discriminatedUnion("type", [
     type: z.literal("questionnaire"),
     data: QuestionnaireDataSchema,
   }),
+  z.object({ ...renderBase, type: z.literal("report"), data: ReportDataSchema }),
 ]);
 export type RenderRequest = z.infer<typeof RenderRequestSchema>;
 
@@ -65,6 +67,8 @@ export function toDoc(request: RenderRequest): Doc {
       return { ...meta, type: "nda", data: request.data };
     case "questionnaire":
       return { ...meta, type: "questionnaire", data: request.data };
+    case "report":
+      return { ...meta, type: "report", data: request.data };
   }
 }
 

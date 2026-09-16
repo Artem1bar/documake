@@ -126,3 +126,66 @@ export function SectionCard({ title, description, children }: SectionCardProps) 
     </section>
   );
 }
+
+interface ItemControlsProps {
+  label: string;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onRemove: () => void;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+}
+
+/** Reorder-and-remove controls for a repeating item, used at both levels of a report. */
+export function ItemControls({
+  label,
+  onMoveUp,
+  onMoveDown,
+  onRemove,
+  canMoveUp,
+  canMoveDown,
+}: ItemControlsProps) {
+  const button =
+    "grid h-7 w-7 place-items-center rounded-md text-neutral-400 transition disabled:opacity-30";
+
+  return (
+    <div className="flex items-center gap-1">
+      <button
+        type="button"
+        onClick={onMoveUp}
+        disabled={!canMoveUp}
+        className={`${button} hover:bg-neutral-100 hover:text-neutral-700`}
+        aria-label={`Move ${label} up`}
+      >
+        ↑
+      </button>
+      <button
+        type="button"
+        onClick={onMoveDown}
+        disabled={!canMoveDown}
+        className={`${button} hover:bg-neutral-100 hover:text-neutral-700`}
+        aria-label={`Move ${label} down`}
+      >
+        ↓
+      </button>
+      <button
+        type="button"
+        onClick={onRemove}
+        className={`${button} hover:bg-red-50 hover:text-red-500`}
+        aria-label={`Remove ${label}`}
+      >
+        ×
+      </button>
+    </div>
+  );
+}
+
+/** Moves an item within a list, returning a new list. Out-of-range moves are ignored. */
+export function moveItem<T>(items: readonly T[], index: number, direction: -1 | 1): T[] {
+  const target = index + direction;
+  if (target < 0 || target >= items.length) return [...items];
+
+  const next = [...items];
+  [next[index], next[target]] = [next[target], next[index]];
+  return next;
+}

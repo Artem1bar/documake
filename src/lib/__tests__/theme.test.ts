@@ -10,10 +10,17 @@ function branding(overrides: Partial<Branding> = {}): Branding {
 }
 
 describe("createPdfTheme", () => {
-  const expectedFonts: Record<FontFamily, { regular: string; bold: string }> = {
-    helvetica: { regular: "Helvetica", bold: "Helvetica-Bold" },
-    times: { regular: "Times-Roman", bold: "Times-Bold" },
-    courier: { regular: "Courier", bold: "Courier-Bold" },
+  const expectedFonts: Record<
+    FontFamily,
+    { regular: string; bold: string; oblique: string }
+  > = {
+    helvetica: {
+      regular: "Helvetica",
+      bold: "Helvetica-Bold",
+      oblique: "Helvetica-Oblique",
+    },
+    times: { regular: "Times-Roman", bold: "Times-Bold", oblique: "Times-Italic" },
+    courier: { regular: "Courier", bold: "Courier-Bold", oblique: "Courier-Oblique" },
   };
 
   it.each(Object.keys(expectedFonts) as FontFamily[])(

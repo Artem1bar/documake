@@ -50,6 +50,14 @@ const TEMPLATES: readonly TemplateCard[] = [
     accent: "bg-amber-100 text-amber-700",
     icon: "?",
   },
+  {
+    type: "report",
+    title: "Report",
+    description:
+      "Write The Map: how work moves through a client's business, with the manual steps marked and costed.",
+    accent: "bg-teal-100 text-teal-700",
+    icon: "◇",
+  },
 ];
 
 function formatUpdatedAt(iso: string): string {

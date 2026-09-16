@@ -8,6 +8,7 @@ import { InvoiceForm } from "@/components/forms/InvoiceForm";
 import { NdaForm } from "@/components/forms/NdaForm";
 import { QuestionnaireForm } from "@/components/forms/QuestionnaireForm";
 import { QuoteForm } from "@/components/forms/QuoteForm";
+import { ReportForm } from "@/components/forms/ReportForm";
 import { SowForm } from "@/components/forms/SowForm";
 import { deleteDoc, upsertDoc } from "@/lib/storage";
 import { useDocs, useProfile } from "@/lib/store-hooks";
@@ -110,6 +111,12 @@ export default function DocumentEditorPage() {
           ) : null}
           {doc.type === "questionnaire" ? (
             <QuestionnaireForm
+              data={doc.data}
+              onChange={(data) => update({ ...doc, data })}
+            />
+          ) : null}
+          {doc.type === "report" ? (
+            <ReportForm
               data={doc.data}
               onChange={(data) => update({ ...doc, data })}
             />

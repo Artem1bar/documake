@@ -7,6 +7,7 @@ const badgeStyles: Record<DocType, string> = {
   sow: "bg-violet-50 text-violet-700 ring-violet-200",
   nda: "bg-indigo-50 text-indigo-700 ring-indigo-200",
   questionnaire: "bg-amber-50 text-amber-700 ring-amber-200",
+  report: "bg-teal-50 text-teal-700 ring-teal-200",
 };
 
 export function DocBadge({ type }: { type: DocType }) {

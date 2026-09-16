@@ -1,8 +1,8 @@
 # Documake
 
 Company documents, minus the busywork. Pick a template — invoice, quote,
-statement of work, NDA, or questionnaire — fill in a form, and download a
-polished PDF. Your company details are entered once in Settings and pre-filled
+statement of work, NDA, questionnaire, or report — fill in a form, and download
+a polished PDF. Your company details are entered once in Settings and pre-filled
 everywhere.
 
 Everything is stored locally in your browser (localStorage). No accounts, no
@@ -25,7 +25,7 @@ Then open the printed localhost URL, pick a template, and fill in the form —
 the PDF preview updates as you type. No env vars are needed.
 
 Production build: `npm run build && npm start`. Checks: `npm test` (Vitest,
-134 tests) and `npm run lint`.
+174 tests) and `npm run lint`.
 
 ## How it works
 
@@ -41,6 +41,25 @@ Production build: `npm run build && npm start`. Checks: `npm test` (Vitest,
 - **Editor** (`/documents/[id]`) — form on the left, live PDF preview on the
   right, download button. Every change autosaves locally.
 
+## Reports
+
+Most templates are a fixed set of fields. A report is not: it is sections of
+typed **blocks** — paragraphs, tables, a costed hours table, lists, checklists,
+quotes and callouts — so a new report template is a preset rather than new code.
+
+The one that ships is **The Map**: how work moves through a client's business,
+with the manual steps marked and costed. Its six sections carry the authoring
+guidance from the template they came from, shown beside each section in the
+editor. That guidance is never saved and never printed, so improving a preset
+improves reports already written.
+
+The hours table takes a frequency and a duration per step and works out weekly
+and annual cost. The working year it assumes lives on the block and prints
+under the table, because an unstated assumption is the one that gets argued
+with.
+
+A table that breaks across pages repeats its header on each page it spans.
+
 ## Architecture
 
 | Layer | Where | Notes |
@@ -50,6 +69,7 @@ Production build: `npm run build && npm start`. Checks: `npm test` (Vitest,
 | Store | `src/lib/storage.ts` | In-memory cache with subscriptions, over an adapter |
 | React bindings | `src/lib/store-hooks.ts` | `useSyncExternalStore`-based hooks |
 | Invoice math | `src/lib/invoice-math.ts` | Integer-cents arithmetic, tested |
+| Report blocks | `src/lib/report/` | Block vocabulary, hours arithmetic, template presets |
 | Profiles | `src/lib/profile-store.ts` | Pure operations over the profile list |
 | PDF templates | `src/components/pdf/` | `@react-pdf/renderer`, per-profile theme |
 | Forms | `src/components/forms/` | One per document type |
@@ -90,7 +110,7 @@ curl -X POST http://localhost:3000/api/render \
   }'
 ```
 
-`type` is `invoice`, `quote`, `sow`, `nda`, or `questionnaire`, and `data` is
+`type` is `invoice`, `quote`, `sow`, `nda`, `questionnaire`, or `report`, and `data` is
 validated against that type's schema. `profile` and `filename` are optional. Success returns the
 PDF; any failure returns `{ success, data, error }` with a 400, 401, or 500.
 
@@ -109,8 +129,8 @@ Vitest covers the money arithmetic (rounding, clamping, float safety), schema
 parsing and factories, storage migrations, profile operations, PDF theming, and
 the render API end to end.
 
-`scripts/render-samples.tsx` renders a sample of each template, plus one
-invoice per brand preset, for visual inspection:
+`scripts/render-samples.tsx` renders sample invoice, NDA, questionnaire and
+report PDFs, plus one invoice per brand preset, for visual inspection:
 
 ```bash
 npx tsx scripts/render-samples.tsx out/
@@ -128,6 +148,8 @@ npx tsx scripts/render-samples.tsx out/
 
 - Company logo on invoices
 - Embedded brand fonts alongside the standard PDF families
+- More report presets on the block system: the access checklist, go-live and
+  handover (the blocks already carry them)
 - More templates (receipt, employment offer)
 - DOCX export alongside PDF
 - Cloud sync / multi-device (would need a backend)
@@ -135,8 +157,8 @@ npx tsx scripts/render-samples.tsx out/
 
 ## Status
 
-Working and in personal use. A fresh clone was verified on 2026-09-04: install,
-lint, tests, and production build all pass with no configuration. Not deployed
+Working and in personal use. Verified on 2026-09-09: install, lint, tests, and
+production build all pass with no configuration. Not deployed
 publicly — it is local-first by design, so run it on your own machine.
 
 ---
